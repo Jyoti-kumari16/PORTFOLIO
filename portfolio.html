@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JYOTI KUMARI · Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;
+  --bg-elevated:lch(6.65% 10.23 323.09);
+  --bg-sidebar:#0a0e13;
+  --line:#1e2630;
+  --text:#c9d1d9;
+  --text-dim:#6e7681;
+  --text-bright:#f0f3f6;
+  --accent:#7ee787;      /* green - strings */
+  --accent2:#79c0ff;     /* blue - keywords */
+  --accent3:#d2a8ff;     /* purple - functions */
+  --accent4:#ffa657;     /* orange - numbers */
+  --accent5:#f47067;     /* red/pink - tags */
+  --mono:'JetBrains Mono', monospace;
+  --sans:'Inter', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.6;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001s !important; transition-duration:0.001s !important;}
+}
+
+/* ---------- Layout shell: editor look ---------- */
+.editor-shell{
+  display:flex;
+  min-height:100vh;
+}
+.sidebar{
+  width:230px;
+  background:var(--bg-sidebar);
+  border-right:1px solid var(--line);
+  position:fixed;
+  top:0; bottom:0; left:0;
+  padding:24px 0;
+  display:flex;
+  flex-direction:column;
+  z-index:100;
+  overflow-y:auto;
+}
+.sidebar-logo{
+  font-family:var(--mono);
+  font-weight:700;
+  color:var(--text-bright);
+  padding:0 20px 20px;
+  font-size:14px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:14px;
+}
+.sidebar-logo span{color:var(--accent);}
+.file-tree{font-family:var(--mono); font-size:13px;}
+.file-tree a{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 20px;
+  color:var(--text-dim);
+  text-decoration:none;
+  border-left:2px solid transparent;
+  transition:background .15s, color .15s, border-color .15s;
+}
+.file-tree a:hover, .file-tree a.active{
+  background:var(--bg-elevated);
+  color:var(--accent2);
+  border-left-color:var(--accent2);
+}
+.file-tree a .dot{color:var(--accent4); font-size:11px;}
+.sidebar-footer{
+  margin-top:auto;
+  padding:16px 20px 0;
+  border-top:1px solid var(--line);
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--text-dim);
+}
+.sidebar-footer a{color:var(--text-dim); text-decoration:none;}
+.sidebar-footer a:hover{color:var(--accent);}
+.social-row{display:flex; gap:14px; margin-top:10px;}
+.social-row a{font-size:16px;}
+
+.main{
+  margin-left:230px;
+  flex:1;
+  min-width:0;
+}
+.tab-bar{
+  height:42px;
+  background:var(--bg-elevated);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  padding:0 20px;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--text-dim);
+  position:sticky;
+  top:0;
+  z-index:50;
+  gap:4px;
+}
+.tab-bar .breadcrumb-sep{color:var(--line); margin:0 4px;}
+
+section{
+  padding:90px 60px;
+  max-width:980px;
+}
+.section-label{
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--accent4);
+  margin-bottom:6px;
+  letter-spacing:.5px;
+}
+.section-label::before{content:"// ";}
+
+/* ---------- Hero / terminal ---------- */
+#home{padding-top:70px;}
+.terminal{
+  background:var(--bg-elevated);
+  border:1px solid var(--line);
+  border-radius:8px;
+  overflow:hidden;
+  max-width:680px;
+  box-shadow:0 20px 60px -20px rgba(0,0,0,.6);
+}
+.terminal-bar{
+  background:#161b22;
+  padding:9px 14px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+}
+.tdot{width:11px;height:11px;border-radius:50%;}
+.tdot.r{background:#f47067;} .tdot.y{background:#ffa657;} .tdot.g{background:#7ee787;}
+.terminal-title{
+  margin-left:8px;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--text-dim);
+}
+.terminal-body{
+  padding:22px 24px 28px;
+  font-family:var(--mono);
+  font-size:14.5px;
+}
+.terminal-body .line{margin-bottom:6px; white-space:pre-wrap;}
+.prompt-sym{color:var(--accent);}
+.cmd{color:var(--text-bright);}
+.out-key{color:var(--accent2);}
+.out-str{color:var(--accent);}
+.cursor{
+  display:inline-block;
+  width:8px; height:16px;
+  background:var(--accent);
+  margin-left:4px;
+  animation:blink 1s step-end infinite;
+  vertical-align:middle;
+}
+@keyframes blink{50%{opacity:0;}}
+
+.hero-headline{
+  font-family:var(--mono);
+  margin-top:34px;
+  font-size:38px;
+  font-weight:800;
+  color:var(--text-bright);
+  line-height:1.25;
+}
+.hero-headline .tag{color:var(--accent5);}
+.hero-headline .kw{color:var(--accent2);}
+.hero-headline .str{color:var(--accent);}
+.hero-sub{
+  margin-top:16px;
+  color:var(--text-dim);
+  font-size:16px;
+  max-width:560px;
+}
+.btn-row{margin-top:32px; display:flex; gap:14px; flex-wrap:wrap;}
+.btn{
+  font-family:var(--mono);
+  font-size:13px;
+  padding:11px 20px;
+  border-radius:6px;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  transition:transform .15s, box-shadow .15s;
+}
+.btn:hover{transform:translateY(-2px);}
+.btn-primary{
+  background:var(--accent);
+  color:#0d1117;
+  font-weight:700;
+}
+.btn-primary:hover{box-shadow:0 8px 24px -8px rgba(126,231,135,.5);}
+.btn-outline{
+  border:1px solid var(--line);
+  color:var(--text);
+}
+.btn-outline:hover{border-color:var(--accent2); color:var(--accent2);}
+
+/* ---------- Hero flex + picture frame ---------- */
+.hero-flex{
+  display:flex;
+  gap:48px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+.hero-left{flex:1; min-width:300px;}
+.hero-right{flex-shrink:0;}
+
+.pic-frame{
+  width:260px;
+  background:var(--bg-elevated);
+  border:1px solid var(--line);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 20px 60px -20px rgba(0,0,0,.6);
+  position:relative;
+}
+.pic-frame::before{
+  content:"";
+  position:absolute;
+  top:-2px; left:-2px; right:-2px; bottom:-2px;
+  border-radius:9px;
+  background:linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3), var(--accent));
+  background-size:300% 300%;
+  z-index:-1;
+  opacity:.55;
+  animation:hue-shift 6s linear infinite;
+}
+@keyframes hue-shift{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+.pic-tabbar{
+  background:#161b22;
+  padding:8px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+  font-family:var(--mono);
+  font-size:11px;
+}
+.pic-tab{color:var(--accent4);}
+.pic-meta{color:var(--text-dim);}
+.pic-canvas{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+  background:
+    linear-gradient(135deg, #161b22 25%, transparent 25%) -10px 0/20px 20px,
+    linear-gradient(225deg, #161b22 25%, transparent 25%) -10px 0/20px 20px,
+    linear-gradient(315deg, #161b22 25%, transparent 25%) 0 0/20px 20px,
+    linear-gradient(45deg,  #161b22 25%, transparent 25%) 0 0/20px 20px,
+    #0d1117;
+  overflow:hidden;
+}
+.pic-canvas img{
+  width:100%; height:100%;
+  object-fit:cover;
+  display:block;
+}
+.pic-placeholder{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  height:100%;
+  color:var(--text-dim);
+  font-family:var(--mono);
+  font-size:11.5px;
+  text-align:center;
+  padding:20px;
+}
+.ph-icon{font-size:30px; color:var(--accent2);}
+.scan{
+  position:absolute;
+  top:0; left:0; right:0;
+  height:30%;
+  background:linear-gradient(180deg, rgba(126,231,135,.12), transparent);
+  animation:scan-move 3.5s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes scan-move{
+  0%, 100%{ top:0%; }
+  50%{ top:70%; }
+}
+.pic-statusbar{
+  background:#161b22;
+  padding:7px 12px;
+  display:flex;
+  justify-content:space-between;
+  font-family:var(--mono);
+  font-size:10.5px;
+  color:var(--text-dim);
+  border-top:1px solid var(--line);
+}
+.dot-live{
+  display:inline-block;
+  width:6px; height:6px;
+  border-radius:50%;
+  background:var(--accent);
+  margin-right:5px;
+  animation:blink 1.4s ease-in-out infinite;
+}
+@media (max-width:840px){
+  .hero-flex{flex-direction:column-reverse;}
+  .pic-frame{width:200px; margin:0 auto;}
+}
+
+/* ---------- generic heading ---------- */
+h2.heading{
+  font-family:var(--mono);
+  font-size:26px;
+  color:var(--text-bright);
+  margin-bottom:34px;
+  font-weight:700;
+}
+h2.heading span{color:var(--text-dim); font-weight:400;}
+
+/* ---------- About ---------- */
+.about-grid{display:flex; gap:50px; flex-wrap:wrap;}
+.about-text{flex:1; min-width:280px; color:var(--text); font-size:15.5px;}
+.about-text p{margin-bottom:14px;}
+.stat-card{
+  background:var(--bg-elevated);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:18px 20px;
+  margin-bottom:12px;
+  min-width:200px;
+}
+.stat-card .num{font-family:var(--mono); font-size:24px; color:var(--accent2); font-weight:700;}
+.stat-card .label{font-size:12px; color:var(--text-dim); margin-top:2px;}
+
+/* ---------- Skills ---------- */
+.skills-block{margin-bottom:28px;}
+.skills-block .cat{
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--accent3);
+  margin-bottom:12px;
+}
+.skills-block .cat::before{content:"const "; color:var(--accent2);}
+.skills-block .cat::after{content:" = [";  color:var(--text-dim);}
+.tag-row{display:flex; flex-wrap:wrap; gap:10px;}
+.tag{
+  font-family:var(--mono);
+  font-size:13px;
+  padding:7px 14px;
+  border-radius:6px;
+  background:var(--bg-elevated);
+  border:1px solid var(--line);
+  color:var(--text);
+  transition:border-color .15s, color .15s;
+}
+.tag:hover{border-color:var(--accent); color:var(--accent);}
+
+/* ---------- Projects ---------- */
+.project-card{
+  background:var(--bg-elevated);
+  border:1px solid var(--line);
+  border-radius:8px;
+  margin-bottom:24px;
+  overflow:hidden;
+}
+.project-card .pf-tabbar{
+  display:flex;
+  background:#161b22;
+  border-bottom:1px solid var(--line);
+}
+.project-card .pf-tab{
+  font-family:var(--mono);
+  font-size:12.5px;
+  padding:10px 16px;
+  color:var(--text-dim);
+  border-right:1px solid var(--line);
+}
+.project-card .pf-tab.active{color:var(--accent4); background:var(--bg-elevated);}
+.project-card .pf-body{padding:24px 26px;}
+.project-card h3{
+  font-family:var(--mono);
+  color:var(--text-bright);
+  font-size:18px;
+  margin-bottom:10px;
+}
+.project-card p{color:var(--text); font-size:14.5px; margin-bottom:16px;}
+.project-card .tag-row{margin-bottom:16px;}
+.project-card .tag{font-size:12px; padding:5px 11px;}
+.project-links{display:flex; gap:18px;}
+.project-links a{
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--accent2);
+  text-decoration:none;
+}
+.project-links a:hover{color:var(--accent);}
+
+/* ---------- Resume ---------- */
+.resume-box{
+  background:var(--bg-elevated);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:32px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:20px;
+}
+.resume-box .left{font-family:var(--mono); color:var(--text);}
+.resume-box .left .fname{color:var(--accent4); font-weight:700;}
+
+/* ---------- Education ---------- */
+.edu-item{
+  display:flex;
+  gap:20px;
+  padding-bottom:22px;
+  border-left:2px solid var(--line);
+  padding-left:24px;
+  position:relative;
+  margin-left:6px;
+}
+.edu-item::before{
+  content:"";
+  width:10px; height:10px;
+  background:var(--accent2);
+  border-radius:50%;
+  position:absolute;
+  left:-6px; top:2px;
+}
+.edu-item:last-child{border-left-color:transparent;}
+.edu-item .yr{font-family:var(--mono); font-size:12px; color:var(--accent4); margin-bottom:4px;}
+.edu-item .inst{color:var(--text-bright); font-weight:600;}
+.edu-item .det{color:var(--text-dim); font-size:13.5px; margin-top:2px;}
+
+/* ---------- Contact ---------- */
+.contact-grid{display:flex; gap:16px; flex-wrap:wrap;}
+.contact-card{
+  flex:1;
+  min-width:220px;
+  background:var(--bg-elevated);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:20px;
+  text-decoration:none;
+  transition:border-color .15s, transform .15s;
+}
+.contact-card:hover{border-color:var(--accent); transform:translateY(-3px);}
+.contact-card .k{font-family:var(--mono); font-size:11px; color:var(--text-dim); margin-bottom:6px;}
+.contact-card .v{color:var(--text-bright); font-size:14.5px; font-weight:600; word-break:break-word;}
+
+footer{
+  padding:30px 60px 50px;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--text-dim);
+  border-top:1px solid var(--line);
+}
+
+/* ---------- Mobile ---------- */
+.menu-toggle{display:none;}
+@media (max-width:840px){
+  .sidebar{
+    width:100%;
+    height:auto;
+    position:relative;
+    flex-direction:row;
+    align-items:center;
+    overflow:visible;
+    padding:14px 16px;
+  }
+  .sidebar-logo{border-bottom:none; padding:0; margin-bottom:0;}
+  .file-tree{display:none;}
+  .menu-toggle{
+    display:block;
+    margin-left:auto;
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:var(--mono);
+    padding:6px 10px;
+    border-radius:6px;
+  }
+  .sidebar-footer{display:none;}
+  .main{margin-left:0;}
+  .file-tree.open{
+    display:flex;
+    flex-direction:column;
+    position:absolute;
+    top:58px; left:0; right:0;
+    background:var(--bg-sidebar);
+    border-bottom:1px solid var(--line);
+    z-index:200;
+  }
+  section{padding:60px 22px;}
+  .hero-headline{font-size:26px;}
+  .terminal-body{font-size:12.5px;}
+}
+</style>
+</head>
+<body>
+
+<div class="editor-shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">JYOTI<span>.dev</span></div>
+    <button class="menu-toggle" onclick="document.getElementById('ftree').classList.toggle('open')">☰ menu</button>
+    <nav class="file-tree" id="ftree">
+      <a href="#home" class="active"><span class="dot">●</span> home.js</a>
+      <a href="#about"><span class="dot">●</span> about.md</a>
+      <a href="#skills"><span class="dot">●</span> skills.json</a>
+      <a href="#projects"><span class="dot">●</span> projects/</a>
+      <a href="#resume"><span class="dot">●</span> resume.pdf</a>
+      <a href="#education"><span class="dot">●</span> education.yml</a>
+      <a href="#contact"><span class="dot">●</span> contact.sh</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div>STATUS: <span style="color:#7ee787">open to internships</span></div>
+      <div class="social-row">
+        <a href="https://github.com/Jyoti-kumari16" target="_blank" title="GitHub">🐙</a>
+        <a href="https://linkedin.com/in/Jyoti-kumari" target="_blank" title="LinkedIn">in</a>
+        <a href="https://leetcode.com/Jyoti-kumari22" target="_blank" title="LeetCode">𝓛</a>
+        <a href="mailto:kumarijyoti9254@gmail.com" title="Email">✉</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="tab-bar">
+      home.js <span class="breadcrumb-sep">/</span> portfolio <span class="breadcrumb-sep">/</span> root
+    </div>
+
+    <!-- HOME -->
+    <section id="home">
+      <div class="hero-flex">
+        <div class="hero-left">
+          <div class="terminal">
+            <div class="terminal-bar">
+              <span class="tdot r"></span><span class="tdot y"></span><span class="tdot g"></span>
+              <span class="terminal-title">Jyoti@portfolio: ~</span>
+            </div>
+            <div class="terminal-body">
+              <div class="line"><span class="prompt-sym">$</span> <span class="cmd">whoami</span></div>
+              <div class="line out-str">JYOTI KUMARI — B.Tech CSE, 3rd Year</div>
+              <div class="line"><span class="out-key">role:</span> <span class="out-str">"Aspiring Software Engineer"</span></div>
+              <div class="line"><span class="out-key">focus:</span> <span class="out-str">"DSA · Web Dev · Open Source"</span></div>
+              <div class="line"><span class="prompt-sym">$</span> <span class="cursor"></span></div>
+            </div>
+          </div>
+
+          <h1 class="hero-headline">
+            Hi, I'm <span class="str">"JYOTI KUMARI"</span><br>
+            <span class="kw">building</span> things with <span class="tag">&lt;code/&gt;</span>
+          </h1>
+          <p class="hero-sub">
+            B.Tech CSE student passionate about building clean, efficient software and solving
+            algorithmic problems. Currently exploring full-stack development and competitive programming.
+          </p>
+          <div class="btn-row">
+            <a href="#projects" class="btn btn-primary">→ View Projects</a>
+            <a href="#" class="btn btn-outline" id="resumeBtnTop">⬇ Download Resume</a>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="pic-frame">
+            <div class="pic-tabbar">
+              <span class="pic-tab">profile.jpg</span>
+              <span class="pic-meta">1:1 · JPG</span>
+            </div>
+            <div class="pic-canvas">
+              <img src="PROFILE PIC.jpeg" alt="JYOTI KUMARI" onerror="this.style.display='none';                    this.nextElementSibling.style.display='flex';">
+              <div class="pic-placeholder">
+                <span class="ph-icon">⎙</span>
+                <span class="ph-text">drop PROFILE PIC.jpeg<br>in this folder</span>
+              </div>
+              <div class="scan"></div>
+            </div>
+            <div class="pic-statusbar">
+              <span><span class="dot-live"></span> rendering</span>
+              <span>RGB · 100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="section-label">about</div>
+      <h2 class="heading">about<span>.md</span></h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>I'm a Computer Science undergraduate with a strong interest in software development,
+          data structures & algorithms, and building real-world web applications. I enjoy turning
+          ideas into working products and constantly learning new technologies.</p>
+          <p>Outside of academics, I actively solve problems on LeetCode, contribute to small
+          open-source projects, and participate in hackathons to sharpen my practical skills.</p>
+        </div>
+        <div>
+          <div class="stat-card"><div class="num">150+</div><div class="label">DSA Problems Solved</div></div>
+          <div class="stat-card"><div class="num">5+</div><div class="label">Projects Built</div></div>
+          <div class="stat-card"><div class="num">7.45</div><div class="label">Current CGPA</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <div class="section-label">skills</div>
+      <h2 class="heading">skills<span>.json</span></h2>
+
+      <div class="skills-block">
+        <div class="cat">languages</div>
+        <div class="tag-row">
+          <span class="tag">C++</span><span class="tag">Python</span><span class="tag">Java</span>
+          <span class="tag">JavaScript</span><span class="tag">SQL</span>
+        </div>
+      </div>
+
+      <div class="skills-block">
+        <div class="cat">webDev</div>
+        <div class="tag-row">
+          <span class="tag">HTML/CSS</span><span class="tag">React</span><span class="tag">Node.js</span>
+          <span class="tag">Express</span><span class="tag">Tailwind CSS</span>
+        </div>
+      </div>
+
+      <div class="skills-block">
+        <div class="cat">toolsAndPlatforms</div>
+        <div class="tag-row">
+          <span class="tag">Git/GitHub</span><span class="tag">MySQL</span><span class="tag">MongoDB</span>
+          <span class="tag">VS Code</span> <span class="tag">numpy </span>
+        </div>
+      </div>
+
+      <div class="skills-block">
+        <div class="cat">coreCS</div>
+        <div class="tag-row">
+          <span class="tag">DSA</span><span class="tag">OOP</span><span class="tag">DBMS</span>
+          <span class="tag">Operating Systems</span><span class="tag">Computer Networks</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+      <div class="section-label">projects</div>
+      <h2 class="heading">projects<span>/</span></h2>
+
+      <div class="project-card">
+        <div class="pf-tabbar">
+          <div class="pf-tab active">project-1.tsx</div>
+        </div>
+        <div class="pf-body">
+          <h3>Tax regime</h3>
+          <p>A full-stack e-commerce platform with user authentication, product catalog,
+          cart, and order management. Built with the MERN stack and integrated payment gateway.</p>
+          <div class="tag-row">
+            <span class="tag">React</span><span class="tag">Node.js</span><span class="tag">MongoDB</span><span            class="tag">Express</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/yourusername/ecommerce-app" target="_blank">→ GitHub</a>
+            <a href="#" target="_blank">→ Live Demo</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="pf-tabbar">
+          <div class="pf-tab active">project-2.py</div>
+        </div>
+        <div class="pf-body">
+          <h3>Student Result Management System</h3>
+          <p>A desktop application to manage student records, calculate grades, and generate
+          report cards, with a MySQL backend for persistent storage.</p>
+          <div class="tag-row">
+            <span class="tag">Python</span><span class="tag">Tkinter</span><span class="tag">MySQL</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/Jyoti-kumari16/result-management" target="_blank">→ GitHub</a>
+            <a href="#" target="_blank">→ Live Demo</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="pf-tabbar">
+          <div class="pf-tab active">project-3.cpp</div>
+        </div>
+        <div class="pf-body">
+          <h3>Pathfinding Visualizer</h3>
+          <p>An interactive tool that visualizes graph algorithms like Dijkstra, BFS, and A*
+          on a dynamic grid, helping users understand pathfinding concepts.</p>
+          <div class="tag-row">
+            <span class="tag">JavaScript</span><span class="tag">HTML Canvas</span><span class="tag">CSS</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/yourusername/pathfinding-visualizer" target="_blank">→ GitHub</a>
+            <a href="#" target="_blank">→ Live Demo</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="pf-tabbar">
+          <div class="pf-tab active">project-4.js</div>
+        </div>
+        <div class="pf-body">
+          <h3>Weather Forecast App</h3>
+          <p>A responsive weather app that fetches real-time data from a public API and
+          displays current conditions and a 5-day forecast for any city.</p>
+          <div class="tag-row">
+            <span class="tag">JavaScript</span><span class="tag">REST API</span><span class="tag">CSS</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/yourusername/weather-app" target="_blank">→ GitHub</a>
+            <a href="#" target="_blank">→ Live Demo</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESUME -->
+    <section id="resume">
+      <div class="section-label">resume</div>
+      <h2 class="heading">resume<span>.pdf</span></h2>
+      <div class="resume-box">
+        <div class="left">
+          <div class="fname">JYOTI_KUMARI_Resume.pdf</div>
+          <div style="color:var(--text-dim); font-size:13px; margin-top:4px;">Updated June 2026 · 1 page</div>
+        </div>
+        <a href="resume.pdf" download class="btn btn-primary" id="resumeBtnMain">⬇ Download Resume</a>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section id="education">
+      <div class="section-label">education</div>
+      <h2 class="heading">education<span>.yml</span></h2>
+
+      <div class="edu-item">
+        <div>
+          <div class="yr">2023 — 2027</div>
+          <div class="inst">RVS COLLEGE OF ENGINEERING AND TECHNOLOGY JAMSHEDPUR</div>
+          <div class="det">B.Tech in Computer Science & Engineering — CGPA: 7.45/10</div>
+        </div>
+      </div>
+      <div class="edu-item">
+        <div>
+          <div class="yr">2021 — 2023</div>
+          <div class="inst">JAMSHEDPUR WOMENS COLLEGE</div>
+          <div class="det">12th Standard (JAC) — 78.02%</div>
+        </div>
+      </div>
+      <div class="edu-item">
+        <div>
+          <div class="yr">2020 — 2021</div>
+          <div class="inst">SMSM GIRLS HIGH SCHOOL VISHTUPUR</div>
+          <div class="det">10th Standard (JAC) — 87.60%</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="section-label">contact</div>
+      <h2 class="heading">contact<span>.sh</span></h2>
+      <div class="contact-grid">
+        <a href="mailto:you@example.com" class="contact-card">
+          <div class="k">EMAIL</div><div class="v">kumarijyoti9254@gmail.com</div>
+        </a>
+        <a href="tel:+910000000000" class="contact-card">
+          <div class="k">PHONE</div><div class="v">+91 7368961922</div>
+        </a>
+        <a href="https://github.com/yourusername" target="_blank" class="contact-card">
+          <div class="k">GITHUB</div><div class="v">github.com/Jyoti-kumari16</div>
+        </a>
+        <a href="https://linkedin.com/in/yourusername" target="_blank" class="contact-card">
+          <div class="k">LINKEDIN</div><div class="v">linkedin.com/Jyoti-kumari/</div>
+        </a>
+        <a href="https://leetcode.com/yourusername" target="_blank" class="contact-card">
+          <div class="k">LEETCODE</div><div class="v">leetcode.com/Jyoti-kumari22</div>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      © 2026 JYOTI KUMARI· Built with HTML, CSS & JS
+    </footer>
+  </main>
+</div>
+
+<script>
+// Highlight active sidebar link on scroll
+const links = document.querySelectorAll('.file-tree a');
+const sections = document.querySelectorAll('section');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top <= 120 && rect.bottom >= 120) current = sec.id;
+  });
+  links.forEach(l => {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+  });
+});
+// Close mobile menu after click
+links.forEach(l => l.addEventListener('click', () => {
+  document.getElementById('ftree').classList.remove('open');
+}));
+</script>
+</body>
+</html>
